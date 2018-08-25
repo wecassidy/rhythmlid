@@ -6,6 +6,7 @@ while the front-end should handle UI.
 """
 
 import os.path
+import re
 
 class MusicLibrary:
     """
@@ -23,6 +24,14 @@ class MusicLibrary:
         |  \- ...
         \- ...
     """
+
+    TRACK_EXTRACT = re.compile(
+        r"(?:.*(?P<disc>\d+)\.)?" # Consume garbage at the start of the name and extract the disc number, if present
+        + "(?P<number>\d+)" # Extract track number
+        + "(?: - )?" # Consume a hyphen separator if it is present
+        + "(?P<title>.*)" # Extract title
+        + "\.[\w]+" # Consume the file extension
+    )
 
     def __init__(self, music_dir):
         """
@@ -42,3 +51,35 @@ class MusicLibrary:
         # Make sure the given library directory is actually a directory
         if not os.path.isdir(self.music_dir):
             raise RuntimeError("Given music directory {} is not a directory".format(self.original_music_dir))
+
+        # Build music library
+        self.library = []
+        self.refresh_library()
+
+    def refresh_library(self):
+        """Scan the filesystem and rebuild the library."""
+
+        self.library = [] # Reset the library
+
+        # Get a list of artists
+        artists = os.scandir(self.music_dir)
+        for artist in artists:
+            if artist.is_dir():
+                # Get a list of albums for this artist
+                album_list = []
+
+                albums = os.scandir(artist.path)
+                for album in albums:
+                    if album.is_dir():
+                        # Get a list of tracks for the album
+                        track_list = []
+
+                        tracks = os.scandir(album.path)
+                        for track in tracks:
+                            # Extract info from the track filename
+                            track_info = MusicLibrary.TRACK_EXTRACT.match(track.name)
+                            track_list.append((track_info.group("title"), track.path))
+
+                        album_list.append((album.name, track_list))
+
+                self.library.append((artist.name, album_list))
