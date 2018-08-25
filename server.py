@@ -1,85 +1,85 @@
 """
-Server-side of a music player that has a web interface. The server
-reads the filesystem to determine the contents of the music library
-and plays the music through whatever audio interface is available,
-while the front-end should handle UI.
+Server-side of a web interface to the Rhythmbox music player. The
+server parses the Rhythmbox database to determine library information,
+then delivers albums, etc. to the web client to display. Playback is
+handled by an instance of Rhythmbox on the server computer.
 """
 
 import os.path
-import re
+import xml.dom.minidom
 
 class MusicLibrary:
     """
-    A data structure to track the state of the music library.
-    Determines artist, song title, etc. from filenames.
-
-    Expected directory structure:
-
-        music library/
-        |- Artist Name/
-        |  |- Album Name/
-        |  |  |- 01 - Song Title.mp3
-        |  |  |- 02 - Song Title.mp3
-        |  |  \- ...
-        |  \- ...
-        \- ...
+    A data structure to track the state of the music library, as
+    extracted from Rhythmbox's XML database.
     """
 
-    TRACK_EXTRACT = re.compile(
-        r"(?:.*(?P<disc>\d+)\.)?" # Consume garbage at the start of the name and extract the disc number, if present
-        + "(?P<number>\d+)" # Extract track number
-        + "(?: - )?" # Consume a hyphen separator if it is present
-        + "(?P<title>.*)" # Extract title
-        + "\.[\w]+" # Consume the file extension
-    )
-
-    def __init__(self, music_dir):
+    def __init__(self, db_file):
         """
-        Load the music library into memory from the filesystem. This
-        method will resolve ~user constructs, shell variables, and
-        other such path complications before loading the library.
+        Load the music library into memory from Rhythmbox's library file.
         """
 
-        self.music_dir = music_dir
+        self.original_db_file = db_file # Cache the unaltered database filename for communicating with the user
         # Resolve ~user constructs, variables and other potential weirdness
-        self.original_music_dir = self.music_dir # Cache the given version for error messages
-        self.music_dir = os.path.normpath(self.music_dir) # Get rid of double slashes
-        self.music_dir = os.path.expandvars(self.music_dir) # Expand variables
-        self.music_dir = os.path.expanduser(self.music_dir) # Expand ~user constructs
-        self.music_dir = os.path.realpath(self.music_dir) # Resolve symlinks
-
-        # Make sure the given library directory is actually a directory
-        if not os.path.isdir(self.music_dir):
-            raise RuntimeError("Given music directory {} is not a directory".format(self.original_music_dir))
+        self.db_file = os.path.realpath(
+            os.path.expanduser(
+                os.path.expandvars(
+                    os.path.normpath(db_file))))
 
         # Build music library
-        self.library = []
+        self.library = {} # Will be populated with a list of artists
         self.refresh_library()
 
     def refresh_library(self):
-        """Scan the filesystem and rebuild the library."""
+        """Scan the Rhythmbox database and rebuild the library."""
 
-        self.library = [] # Reset the library
+        # Reset library to empty
+        self.library = {}
 
-        # Get a list of artists
-        artists = os.scandir(self.music_dir)
-        for artist in artists:
-            if artist.is_dir():
-                # Get a list of albums for this artist
-                album_list = []
+        # Load the XML DOM
+        db_dom = xml.dom.minidom.parse(self.db_file)
 
-                albums = os.scandir(artist.path)
-                for album in albums:
-                    if album.is_dir():
-                        # Get a list of tracks for the album
-                        track_list = []
+        # Get the list of database entries
+        entries = db_dom.getElementsByTagName("entry")
 
-                        tracks = os.scandir(album.path)
-                        for track in tracks:
-                            # Extract info from the track filename
-                            track_info = MusicLibrary.TRACK_EXTRACT.match(track.name)
-                            track_list.append((track_info.group("title"), track.path))
+        # Filter down to a list of songs
+        songs = filter(lambda entry: entry.getAttribute("type") == "song", entries)
 
-                        album_list.append((album.name, track_list))
+        # Sort the songs into a list of artists and albums
+        for song in songs:
+            # Extract song info
+            song_info = {}
+            for info_node in song.childNodes:
+                if isinstance(info_node, xml.dom.minidom.Text): # Skip text nodes at this level
+                    continue
 
-                self.library.append((artist.name, album_list))
+                song_info[info_node.nodeName] = info_node.childNodes[0].wholeText
+
+            # Get the artist to classify this song by
+            if "album-artist" in song_info: # Use album artist, if available
+                artist = song_info["album-artist"]
+            else:
+                artist = song_info["artist"]
+
+            # Add the track to the library
+            if artist not in self.library:
+                self.library[artist] = {song_info["album"]: [song_info]}
+            elif song_info["album"] not in self.library[artist]:
+                self.library[artist][song_info["album"]] = [song_info]
+            else:
+                self.library[artist][song_info["album"]].append(song_info)
+
+        # Sort albums by disc and track number
+        for artist in self.library:
+            for album in self.library[artist]:
+                # First sort by track number
+                self.library[artist][album].sort(key=lambda song: int(song["track-number"]))
+
+                # If there are multiple discs in the album, also sort
+                # by disc number.
+                if "disc-number" in self.library[artist][album][0]:
+                    # This line will not perturb track number order
+                    # because list.sort is stable: if two elements
+                    # evaluate as equal (as they will when they are on
+                    # the same disc) their order will be preserved.
+                    self.library[artist][album].sort(key=lambda song: int(song["disc-number"]))
