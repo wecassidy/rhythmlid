@@ -1,8 +1,10 @@
 """
-Server-side of a web interface to the Rhythmbox music player. The
-server parses the Rhythmbox database to determine library information,
-then delivers albums, etc. to the web client to display. Playback is
-handled by an instance of Rhythmbox on the server computer.
+Server-side of a web interface to the Rhythmbox music player.
+
+The server parses the Rhythmbox database to determine library
+information, then delivers albums, etc. to the web client to display.
+Playback is handled by an instance of Rhythmbox on the server
+computer.
 """
 
 import os.path
@@ -11,15 +13,13 @@ import xml.dom.minidom
 
 class MusicLibrary:
     """
-    A data structure to track the state of the music library, as
-    extracted from Rhythmbox's XML database.
+    A data structure to track the state of the music library.
+
+    The library is constructed from Rhythmbox's XML database.
     """
 
     def __init__(self, db_file):
-        """
-        Load the music library into memory from Rhythmbox's library file.
-        """
-
+        """Load the music library into memory from Rhythmbox's library file."""
         self.original_db_file = db_file # Cache the unaltered database filename for communicating with the user
         # Resolve ~user constructs, variables and other potential weirdness
         self.db_file = os.path.realpath(
@@ -33,7 +33,6 @@ class MusicLibrary:
 
     def refresh_library(self):
         """Scan the Rhythmbox database and rebuild the library."""
-
         # Reset library to empty
         self.library = {}
 
@@ -86,10 +85,7 @@ class MusicLibrary:
                     self.library[artist][album].sort(key=lambda song: int(song["disc-number"]))
 
     def artists(self, search=None):
-        """
-        Get a list of artists, optionally filtering using a regex.
-        """
-
+        """Get a list of artists, optionally filtering using a regex."""
         # Collect list of artists
         artists = self.library.keys()
 
@@ -101,10 +97,7 @@ class MusicLibrary:
         return list(artists)
 
     def albums(self, search=None):
-        """
-        Get a list of albums, optionally filtering using a regex.
-        """
-
+        """Get a list of albums, optionally filtering using a regex."""
         # Collect list of albums
         albums = []
         for artist in self.library:
@@ -118,10 +111,7 @@ class MusicLibrary:
         return list(albums)
 
     def songs(self, search=None):
-        """
-        Get a list of songs, optionally filtering using a regex.
-        """
-
+        """Get a list of songs, optionally filtering using a regex."""
         # Collect list of songs
         songs = []
         for artist in self.library:
