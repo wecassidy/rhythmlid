@@ -6,6 +6,7 @@ handled by an instance of Rhythmbox on the server computer.
 """
 
 import os.path
+import re
 import xml.dom.minidom
 
 class MusicLibrary:
@@ -83,3 +84,54 @@ class MusicLibrary:
                     # evaluate as equal (as they will when they are on
                     # the same disc) their order will be preserved.
                     self.library[artist][album].sort(key=lambda song: int(song["disc-number"]))
+
+    def artists(self, search=None):
+        """
+        Get a list of artists, optionally filtering using a regex.
+        """
+
+        # Collect list of artists
+        artists = self.library.keys()
+
+        # Filter down to matches if searching
+        if search is not None:
+            pattern = re.compile(search)
+            artists = filter(lambda a: pattern.search(a), artists)
+
+        return list(artists)
+
+    def albums(self, search=None):
+        """
+        Get a list of albums, optionally filtering using a regex.
+        """
+
+        # Collect list of albums
+        albums = []
+        for artist in self.library:
+            albums.extend(self.library[artist].keys())
+
+        # Filter down to matches if searching
+        if search is not None:
+            pattern = re.compile(search)
+            albums = filter(lambda a: pattern.search(a), albums)
+
+        return list(albums)
+
+    def songs(self, search=None):
+        """
+        Get a list of songs, optionally filtering using a regex.
+        """
+
+        # Collect list of songs
+        songs = []
+        for artist in self.library:
+            for album in self.library[artist]:
+                for song in self.library[artist][album]:
+                    songs.append(song["title"])
+
+        # Filter down to matches if searching
+        if search is not None:
+            pattern = re.compile(search)
+            songs = filter(lambda a: pattern.search(a), songs)
+
+        return list(songs)
