@@ -1,4 +1,4 @@
-# A web interface for the Rhythmbox music player
+# Rhythmlid: a web interface on top of Rhythmbox
 
 This application creates a web-based interface for an instance of
 Rhythmbox on the host computer. It allows (nearly) full control of
