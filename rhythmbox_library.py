@@ -91,7 +91,7 @@ class MusicLibrary:
             pattern = re.compile(search)
             artists = filter(lambda a: pattern.search(a), artists)
 
-        return list(artists)
+        return sorted(list(artists))
 
     def albums(self, search=None):
         """Get a list of albums, optionally filtering using a regex."""
@@ -105,7 +105,7 @@ class MusicLibrary:
             pattern = re.compile(search)
             albums = filter(lambda a: pattern.search(a), albums)
 
-        return list(albums)
+        return sorted(list(albums))
 
     def songs(self, search=None):
         """Get a list of songs, optionally filtering using a regex."""
@@ -121,4 +121,4 @@ class MusicLibrary:
             pattern = re.compile(search)
             songs = filter(lambda a: pattern.search(a), songs)
 
-        return list(songs)
+        return sorted(list(songs))
