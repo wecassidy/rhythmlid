@@ -31,7 +31,11 @@
     </div>
     <div id="artists" class="sidebar">
       <div id="artist-head" class="sidebar-head">ARTISTS</div>
-      <div id="artist-list" class="sidebar-list"></div>
+      <div id="artist-list" class="sidebar-list">
+        {% for artist in ml.artists() %}
+          <div class="artist">{{ artist }}</div>
+        {% endfor %}
+      </div>
     </div>
     <div id="albums"></div>
     <div id="queue" class="sidebar">

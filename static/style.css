@@ -123,6 +123,16 @@ body {
   z-index: 1;
 }
 
+.artist {
+  font-size: 1.5em;
+  padding: 0.75em;
+  position: relative;
+}
+
+.artist:hover {
+  background-color: #bbc;
+}
+
 #albums {
   grid-column: 2;
   grid-row: 2;

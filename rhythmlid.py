@@ -16,6 +16,6 @@ app = Flask(__name__)
 # Load the library
 ml = MusicLibrary("~/.local/share/rhythmbox/rhythmdb.xml")
 
-@app.route("/<artist>")
-def artist_selected(artist):
-    return render_template("player.j2", library=ml, artist=artist)
+@app.route("/")
+def rhythmlid():
+    return render_template("player.j2", ml=ml)
