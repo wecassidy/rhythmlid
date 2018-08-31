@@ -1,10 +1,7 @@
 """
-Server-side of a web interface to the Rhythmbox music player.
-
-The server parses the Rhythmbox database to determine library
-information, then delivers albums, etc. to the web client to display.
-Playback is handled by an instance of Rhythmbox on the server
-computer.
+Interface with the Rhythmbox library. The MusicLibrary class reads the
+Rhythmbox library and builds a list of artists, albums, and songs out
+of it.
 """
 
 import os.path
