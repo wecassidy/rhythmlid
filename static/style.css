@@ -4,6 +4,30 @@
   margin: 0.5em;
 }
 
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background-color: #667;
+}
+
+.sidebar-list {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.sidebar-head {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 10% 10% 5% 10%;
+  padding: 0 0 3% 2%;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  color: #ccc;
+  border-bottom: 3px solid #99a;
+}
+
 /* Overall layout */
 body {
   position: fixed;
