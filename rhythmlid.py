@@ -18,4 +18,4 @@ ml = MusicLibrary("~/.local/share/rhythmbox/rhythmdb.xml")
 
 @app.route("/<artist>")
 def artist_selected(artist):
-    return render_template("player.j2", library=ml, artist=artist, stylesheet=url_for("static", "style.css"))
+    return render_template("player.j2", library=ml, artist=artist)

@@ -3,10 +3,31 @@
   <head>
     <meta charset="utf-8"/>
     <title>Rhythmlid</title>
-    <link rel="stylesheet" href="{{ stylesheet }}" type="text/css" media="screen" />
+    <link rel="stylesheet" href="static/normalize.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/style.css" type="text/css" media="screen" />
   </head>
   <body>
-    <div id="head"></div>
+    <div id="head">
+      <div id="controls">
+        <div id="controls-left">
+          <span class="icon fas fa-backward"></span>
+          <span class="icon far fa-play-circle"></span>
+          <span class="icon fas fa-forward"></span>
+        </div>
+        <div id="controls-time">
+          <div id="time-elapsed">0:00</div>
+          <div id="slider-bar">
+            <div id="slider-knob" style="left: 0"></div>
+          </div>
+          <div id="time-remaining">-0:00</div>
+        </div>
+        <div id="controls-right">
+          <span class="icon fas fa-volume-up"></span>
+          <span class="icon fas fa-random"></span>
+        </div>
+      </div>
+    </div>
     <div id="artists"></div>
     <div id="albums"></div>
     <div id="queue"></div>
