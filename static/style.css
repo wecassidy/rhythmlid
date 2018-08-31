@@ -1,4 +1,8 @@
 /* Cross-element styling */
+body {
+  font-family: "Lato", sans-serif;
+}
+
 .icon {
   font-size: 1.5em;
   margin: 0.5em;
