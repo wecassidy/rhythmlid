@@ -1,0 +1,33 @@
+/* Overall layout */
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-rows: 200px 1fr;
+}
+
+#head {
+  grid-column: 1 / 4;
+  grid-row: 1;
+  z-index: 2;
+}
+
+#artists {
+  grid-column: 1;
+  grid-row: 2;
+  z-index: 1;
+}
+
+#albums {
+  grid-column: 2;
+  grid-row: 2;
+  z-index: 0;
+}
+
+#queue {
+  grid-column: 3;
+  grid-row: 2;
+  z-index: 1;
+}
